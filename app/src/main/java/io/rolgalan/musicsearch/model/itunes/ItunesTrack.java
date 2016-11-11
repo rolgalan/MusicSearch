@@ -41,12 +41,19 @@ public class ItunesTrack implements Track {
 
     @Override
     public String getReleaseDate() {
+        //TODO human format
         return itunesObject.getReleaseDate();
     }
 
     @Override
     public String getPreviewUrl() {
         return itunesObject.getPreviewUrl();
+    }
+
+    @Override
+    public String getTrackPriceWithCurrency() {
+        //TODO handle different currencies properly (UK pounds go before!)
+        return itunesObject.getTrackPrice() + itunesObject.getCurrency();
     }
 
     @Override
@@ -62,6 +69,12 @@ public class ItunesTrack implements Track {
     @Override
     public int getTrackTimeMillis() {
         return itunesObject.getTrackTimeMillis();
+    }
+
+    @Override
+    public String getTrackTime() {
+        //TODO human format
+        return String.valueOf(getTrackTimeMillis());
     }
 
     @Override

@@ -19,11 +19,15 @@ public interface Track {
 
     String getPreviewUrl();
 
+    String getTrackPriceWithCurrency();
+
     double getTrackPrice();
 
     double getCollectionPrice();
 
     int getTrackTimeMillis();
+
+    String getTrackTime();
 
     String getCountry();
 
