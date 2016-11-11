@@ -1,22 +1,15 @@
 package io.rolgalan.musicsearch;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import java.util.List;
-
-import io.rolgalan.musicsearch.dummy.DummyContent;
+import android.widget.LinearLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,7 +19,9 @@ import io.rolgalan.musicsearch.server.ApiManager;
 import io.rolgalan.musicsearch.server.SearchResponseInterface;
 import io.rolgalan.musicsearch.server.model.SearchResponse;
 
-import static io.rolgalan.musicsearch.dummy.DummyContent.addItem;
+import io.rolgalan.musicsearch.data.DataProvider;
+import io.rolgalan.musicsearch.view.ParentRecyclerView;
+import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
 
 /**
  * An activity representing a list of Tracks. This activity
@@ -36,7 +31,7 @@ import static io.rolgalan.musicsearch.dummy.DummyContent.addItem;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class TrackListActivity extends AppCompatActivity {
+public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView {
     public static final String TAG = "Music";
 
     @BindView(R.id.fab)
@@ -81,16 +76,20 @@ public class TrackListActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean isTwoPane() {
+        return mTwoPane;
+    }
+
     private final class SongsSearchResponseInterface implements SearchResponseInterface {
 
         @Override
         public void onResultsReceived(SearchResponse response) {
             Log.i(TAG, "results: " + response.getResultCount());
-            DummyContent.clear();
+            DataProvider.clear();
             int i = 0;
             for (Track t : new ItunesTracksList(response)) {
-                DummyContent.DummyItem item = new DummyContent.DummyItem(String.valueOf(i++), t);
-                addItem(item);
+                DataProvider.addTrack(i++, t);
             }
             recyclerView.getAdapter().notifyDataSetChanged();
         }
@@ -103,75 +102,9 @@ public class TrackListActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         assert recyclerView != null;
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
-    }
-
-    public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-        private final List<DummyContent.DummyItem> mValues;
-
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-            mValues = items;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.track_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(TrackDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        TrackDetailFragment fragment = new TrackDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.track_detail_container, fragment)
-                                .commit();
-                    } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, TrackDetailActivity.class);
-                        intent.putExtra(TrackDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
-                        context.startActivity(intent);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public final View mView;
-            public final TextView mIdView;
-            public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mContentView.getText() + "'";
-            }
-        }
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(recyclerView.getContext(), LinearLayout.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DataProvider.ITEMS));
     }
 }
