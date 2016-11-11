@@ -134,4 +134,9 @@ public class ItunesObject {
     public boolean isStreamable() {
         return isStreamable;
     }
+
+    @Override
+    public String toString(){
+        return "ItunesObject " + wrapperType + " - " + kind;
+    }
 }

@@ -1,5 +1,6 @@
 package io.rolgalan.musicsearch.model;
 
+import io.rolgalan.musicsearch.model.Track;
 import io.rolgalan.musicsearch.server.model.ItunesObject;
 
 /**
@@ -76,5 +77,10 @@ public class ItunesTrack implements Track {
     @Override
     public String getPrimaryGenreName() {
         return itunesObject.getPrimaryGenreName();
+    }
+
+    @Override
+    public String toString() {
+        return "ItunesTrack " + getTrackName() + " - " + getArtistName() + " (" + getTrackTimeMillis() + ")";
     }
 }
