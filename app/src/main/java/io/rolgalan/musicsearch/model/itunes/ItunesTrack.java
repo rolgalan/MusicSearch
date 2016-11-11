@@ -1,4 +1,4 @@
-package io.rolgalan.musicsearch.model;
+package io.rolgalan.musicsearch.model.itunes;
 
 import io.rolgalan.musicsearch.model.Track;
 import io.rolgalan.musicsearch.server.model.ItunesObject;

@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.rolgalan.musicsearch.model.Track;
+import io.rolgalan.musicsearch.model.itunes.ItunesTrack;
+import io.rolgalan.musicsearch.server.model.ItunesObject;
+
 /**
  * Helper class for providing sample content for user interfaces created by
  * Android template wizards.
@@ -16,12 +20,12 @@ public class DummyContent {
     /**
      * An array of sample (dummy) items.
      */
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public static final List<DummyItem> ITEMS = new ArrayList<>();
 
     /**
      * A map of sample (dummy) items, by ID.
      */
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<>();
 
     private static final int COUNT = 25;
 
@@ -32,13 +36,13 @@ public class DummyContent {
         }
     }
 
-    private static void addItem(DummyItem item) {
+    public static void addItem(DummyItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
     private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
+        return new DummyItem(String.valueOf(position), new ItunesTrack(ItunesObject.fake()));
     }
 
     private static String makeDetails(int position) {
@@ -50,6 +54,11 @@ public class DummyContent {
         return builder.toString();
     }
 
+    public static void clear() {
+        ITEMS.clear();
+        ITEM_MAP.clear();
+    }
+
     /**
      * A dummy item representing a piece of content.
      */
@@ -57,11 +66,13 @@ public class DummyContent {
         public final String id;
         public final String content;
         public final String details;
+        private final Track track;
 
-        public DummyItem(String id, String content, String details) {
+        public DummyItem(String id, Track track) {
             this.id = id;
-            this.content = content;
-            this.details = details;
+            this.track = track;
+            this.content = track.getTrackName();
+            this.details = track.getArtistName();
         }
 
         @Override
