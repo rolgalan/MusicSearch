@@ -55,7 +55,6 @@ public class ItunesObject {
 
     public static ItunesObject fake() {
         ItunesObject io = new ItunesObject();
-        //wrapperType":"track", "kind":"song",
         io.wrapperType = "track";
         io.kind = "song";
         io.artistName = "artistName " + Long.toHexString(Double.doubleToLongBits(Math.random()));
@@ -63,6 +62,7 @@ public class ItunesObject {
         io.trackName = "trackName " + Long.toHexString(Double.doubleToLongBits(Math.random()));
         io.primaryGenreName = "primaryGenreName " + Long.toHexString(Double.doubleToLongBits(Math.random()));
         io.trackPrice = (int) Math.round(Math.random() * 25);
+        io.currency = "€";
         io.trackTimeMillis = 50000 + (int) Math.round(Math.random() * 120000);
         return io;
     }
