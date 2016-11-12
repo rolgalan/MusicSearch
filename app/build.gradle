@@ -66,6 +66,8 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:${RETROFIT_VERSION}"
     compile "com.squareup.retrofit2:converter-gson:${RETROFIT_VERSION}"
 
+    compile 'com.github.arimorty:floatingsearchview:2.0.3'
+
     // **** TEST **** //
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
