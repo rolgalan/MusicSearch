@@ -5,4 +5,5 @@
     <string name="sort_genre">Sort by genre</string>
     <string name="sort_price">Sort by price</string>
     <string name="sort_original">Initial sorting</string>
+    <string name="search_hint">Search...</string>
 </resources>
