@@ -18,6 +18,7 @@
             android:id="@+id/floating_search_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:imeOptions="actionSearch"
             app:floatingSearch_close_search_on_keyboard_dismiss="true"
             app:floatingSearch_leftActionMode="noLeftAction"
             app:floatingSearch_menu="@menu/menu_main"

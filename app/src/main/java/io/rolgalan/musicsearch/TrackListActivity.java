@@ -7,8 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -35,7 +37,7 @@ import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView {
+public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface {
     public static final String TAG = "Music";
 
     @BindView(R.id.fab)
@@ -44,6 +46,8 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     FloatingSearchView searchView;
     @BindView(R.id.track_list)
     RecyclerView recyclerView;
+    @BindView(R.id.search_bar_text)
+    EditText searchBarText;
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -84,7 +88,8 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
 
     private void setupSearchView() {
         //Fix bug in library for som Android versions https://github.com/arimorty/floatingsearchview/issues/159
-        ((TextView) searchView.findViewById(R.id.search_bar_text)).setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        searchBarText.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        searchBarText.setSingleLine();
 
         searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
             @Override
@@ -98,6 +103,16 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
                     //searchView.showProgress();
                     //and pass them with searchView.swapSuggestions(newSuggestions);
                 }
+            }
+        });
+
+        searchBarText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                String mLastQuery = textView.getText().toString();
+                Log.d(TAG, "onEditorAction() " + mLastQuery);
+                searchQuery(mLastQuery);
+                return true;
             }
         });
 
@@ -116,12 +131,23 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
                 searchQuery(query);
             }
         });
+
+        searchView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+                Log.d(TAG, "onKeyListener() " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    Log.d(TAG, "onKeyListener() KEYCODE_ENTER");
+                    //return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void searchQuery(String query) {
-        //TODO Do not generate new response interface each time
-        ApiManager.getInstance().tracksSearch(query, new SongsSearchResponseInterface());
-
+        searchView.showProgress();
+        ApiManager.getInstance().tracksSearch(query, this);
     }
 
     @Override
@@ -129,26 +155,24 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
         return mTwoPane;
     }
 
-    /**
-     * TODO Make this class static with a weak reference for performance's sake
-     */
-    private final class SongsSearchResponseInterface implements SearchResponseInterface {
-
-        @Override
-        public void onResultsReceived(SearchResponse response) {
-            Log.i(TAG, "results: " + response.getResultCount());
-            DataProvider.clear();
-            int i = 0;
-            for (Track t : new ItunesTracksList(response)) {
-                DataProvider.addTrack(i++, t);
-            }
-            recyclerView.getAdapter().notifyDataSetChanged();
+    @Override
+    public void onResultsReceived(SearchResponse response) {
+        Log.i(TAG, "results: " + response.getResultCount());
+        DataProvider.clear();
+        int i = 0;
+        for (Track t : new ItunesTracksList(response)) {
+            DataProvider.addTrack(i++, t);
         }
-
-        @Override
-        public void onError(String error) {
-            Snackbar.make(fab, error, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        recyclerView.getAdapter().notifyDataSetChanged();
+        searchView.hideProgress();
+        if (searchView.isSearchBarFocused()) {
+            searchView.clearSearchFocus();
         }
+    }
+
+    @Override
+    public void onError(String error) {
+        Snackbar.make(fab, error, Snackbar.LENGTH_LONG).setAction("Action", null).show();
     }
 
     private void setupRecyclerView() {
