@@ -6,10 +6,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,9 +28,9 @@ import io.rolgalan.musicsearch.view.ParentRecyclerView;
 import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
 
 /**
- * An activity representing a list of Tracks. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
+ * An activity for searching {@link Track} and representing a list of them.
+ * This activity has different presentations for handset and tablet-size devices.
+ * On handsets, the activity presents a list of items, which when touched,
  * lead to a {@link TrackDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
@@ -36,8 +40,8 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    @BindView(R.id.floating_search_view)
+    FloatingSearchView searchView;
     @BindView(R.id.track_list)
     RecyclerView recyclerView;
 
@@ -54,26 +58,70 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
 
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                ApiManager.getInstance().tracksSearch("Michael Jackson", new SongsSearchResponseInterface());
+                //TODO Remove. Just for search tracks faster while developing
+                searchQuery("Michael Jackson");
             }
         });
 
         setupRecyclerView();
 
-        if (findViewById(R.id.track_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-        }
+        setupSearchView();
+
+        checkTwoPane();
+    }
+
+    /**
+     * The detail container view will be present only in the
+     * large-screen layouts (res/values-w900dp).
+     * If this view is present, then the activity should be in two-pane mode.
+     */
+    private void checkTwoPane() {
+        mTwoPane = findViewById(R.id.track_detail_container) != null;
+    }
+
+    private void setupSearchView() {
+        //Fix bug in library for som Android versions https://github.com/arimorty/floatingsearchview/issues/159
+        ((TextView) searchView.findViewById(R.id.search_bar_text)).setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+
+        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, final String newQuery) {
+                Log.d(TAG, "onSearchTextChanged() " + newQuery);
+
+                if (!oldQuery.equals("") && newQuery.equals("")) {
+                    searchView.clearSuggestions();
+                } else {
+                    //TODO load suggestions based on newQuery
+                    //searchView.showProgress();
+                    //and pass them with searchView.swapSuggestions(newSuggestions);
+                }
+            }
+        });
+
+        searchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
+            @Override
+            public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
+                String mLastQuery = searchSuggestion.getBody();
+                Log.d(TAG, "onSuggestionClicked() " + mLastQuery);
+                searchQuery(mLastQuery);
+            }
+
+            @Override
+            public void onSearchAction(String query) {
+                Log.d(TAG, "onSearchAction() " + query);
+                //mLastQuery = query;
+                searchQuery(query);
+            }
+        });
+    }
+
+    private void searchQuery(String query) {
+        //TODO Do not generate new response interface each time
+        ApiManager.getInstance().tracksSearch(query, new SongsSearchResponseInterface());
+
     }
 
     @Override
@@ -81,6 +129,9 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
         return mTwoPane;
     }
 
+    /**
+     * TODO Make this class static with a weak reference for performance's sake
+     */
     private final class SongsSearchResponseInterface implements SearchResponseInterface {
 
         @Override
