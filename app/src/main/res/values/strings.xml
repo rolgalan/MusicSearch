@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">MusicSearch</string>
     <string name="title_track_detail">Track Detail</string>
+    <string name="sort_lenght">Sort by length</string>
+    <string name="sort_genre">Sort by genre</string>
+    <string name="sort_price">Sort by price</string>
+    <string name="sort_original">Initial sorting</string>
 </resources>
