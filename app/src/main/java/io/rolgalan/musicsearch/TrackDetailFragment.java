@@ -45,7 +45,7 @@ public class TrackDetailFragment extends Fragment {
             // Load the Track content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mTrack = DataProvider.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            mTrack = DataProvider.ITEM_MAP.get(getArguments().getInt(ARG_ITEM_ID));
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
@@ -56,8 +56,7 @@ public class TrackDetailFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.track_detail, container, false);
 
         // Show the Track content as text in a TextView.
