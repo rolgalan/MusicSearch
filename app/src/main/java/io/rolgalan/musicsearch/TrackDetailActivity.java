@@ -9,6 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.rolgalan.musicsearch.data.DataProvider;
+import io.rolgalan.musicsearch.model.Track;
+import io.rolgalan.musicsearch.view.TwoPaneableActivity;
 
 /**
  * An activity representing a single Track detail screen. This
@@ -16,16 +25,23 @@ import android.view.View;
  * item details are presented side-by-side with a list of items
  * in a {@link TrackListActivity}.
  */
-public class TrackDetailActivity extends AppCompatActivity {
+public class TrackDetailActivity extends AppCompatActivity implements TwoPaneableActivity {
+    @BindView(R.id.detail_toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.list_image)
+    ImageView image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,26 +69,42 @@ public class TrackDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putInt(TrackDetailFragment.ARG_ITEM_ID,
-                    getIntent().getIntExtra(TrackDetailFragment.ARG_ITEM_ID, 0));
+            arguments.putInt(TrackDetailFragment.ARG_ITEM_ID, getIntent().getIntExtra(TrackDetailFragment.ARG_ITEM_ID, 0));
             TrackDetailFragment fragment = new TrackDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.track_detail_container, fragment)
                     .commit();
         }
+
+        loadCoverOnToolbar(getIntent().getIntExtra(TrackDetailFragment.ARG_ITEM_ID, -1));
+    }
+
+    private void loadCoverOnToolbar(int pos) {
+        if (pos < 0) return;
+
+        Track track = DataProvider.ITEM_MAP.get(pos);
+        if (track == null) return;
+
+        String imgUrl = track.getArtworkUrl100();
+        if (imgUrl != null && !imgUrl.isEmpty()) {
+            Glide.with(this).load(imgUrl)
+                    .fitCenter()
+                    .placeholder(R.drawable.placeholder_256)
+                    .crossFade()
+                    .into(image);
+        }
+    }
+
+    @Override
+    public boolean isTwoPane() {
+        return false;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            // This ID represents the Home or Up button. In the case of this
-            // activity, the Up button is shown. For
-            // more details, see the Navigation pattern on Android Design:
-            //
-            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-            //
             navigateUpTo(new Intent(this, TrackListActivity.class));
             return true;
         }

@@ -24,7 +24,6 @@
         </activity>
         <activity
             android:name=".TrackDetailActivity"
-            android:label="@string/title_track_detail"
             android:parentActivityName=".TrackListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

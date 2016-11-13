@@ -19,6 +19,7 @@ import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import io.rolgalan.musicsearch.model.Track;
 import io.rolgalan.musicsearch.model.itunes.ItunesTracksList;
 import io.rolgalan.musicsearch.server.ApiManager;
@@ -28,6 +29,7 @@ import io.rolgalan.musicsearch.server.model.SearchResponse;
 import io.rolgalan.musicsearch.data.DataProvider;
 import io.rolgalan.musicsearch.view.ParentRecyclerView;
 import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
+import io.rolgalan.musicsearch.view.TwoPaneableActivity;
 
 /**
  * An activity for searching {@link Track} and representing a list of them.
@@ -37,7 +39,7 @@ import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface {
+public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface, TwoPaneableActivity {
     public static final String TAG = "Music";
 
     @BindView(R.id.fab)

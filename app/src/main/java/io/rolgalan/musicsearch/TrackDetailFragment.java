@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.rolgalan.musicsearch.data.DataProvider;
 import io.rolgalan.musicsearch.model.Track;
 
@@ -19,6 +21,23 @@ import io.rolgalan.musicsearch.model.Track;
  * on handsets.
  */
 public class TrackDetailFragment extends Fragment {
+    @BindView(R.id.list_album)
+    TextView album;
+    @BindView(R.id.list_artist)
+    TextView artist;
+    @BindView(R.id.list_date)
+    TextView date;
+    @BindView(R.id.list_genre)
+    TextView genre;
+    @BindView(R.id.list_length)
+    TextView length;
+    @BindView(R.id.list_price)
+    TextView price;
+    @BindView(R.id.list_title)
+    TextView title;
+    // @BindView(R.id.list_image)
+    //  ImageView image;
+
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -50,7 +69,7 @@ public class TrackDetailFragment extends Fragment {
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mTrack.getArtistName());
+                appBarLayout.setTitle(mTrack.getTrackName());
             }
         }
     }
@@ -59,11 +78,19 @@ public class TrackDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.track_detail, container, false);
 
-        // Show the Track content as text in a TextView.
-        if (mTrack != null) {
-            ((TextView) rootView.findViewById(R.id.track_detail)).setText(mTrack.getTrackName());
-        }
+        ButterKnife.bind(this, rootView);
+        updateViews();
 
         return rootView;
+    }
+
+    public void updateViews() {
+        album.setText(mTrack.getCollectionName());
+        artist.setText(mTrack.getArtistName());
+        date.setText(mTrack.getReleaseDate());
+        genre.setText(mTrack.getPrimaryGenreName());
+        length.setText(mTrack.getTrackTime());
+        price.setText(mTrack.getTrackPriceWithCurrency());
+        title.setText(mTrack.getTrackName());
     }
 }
