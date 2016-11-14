@@ -1,12 +1,12 @@
 package io.rolgalan.musicsearch.model.itunes;
 
-import io.rolgalan.musicsearch.model.Track;
-import io.rolgalan.musicsearch.server.model.ItunesObject;
-
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import io.rolgalan.musicsearch.model.Track;
+import io.rolgalan.musicsearch.server.model.ItunesObject;
 
 /**
  * Implementation of Track for iTunes objects.
@@ -19,6 +19,7 @@ import java.util.Date;
 public class ItunesTrack implements Track {
     private static final SimpleDateFormat serverParser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     private static final SimpleDateFormat viewParser = new SimpleDateFormat("MM/dd/yyyy");
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#0.00");
 
     private final ItunesObject itunesObject;
     private Date mDate;
@@ -76,7 +77,8 @@ public class ItunesTrack implements Track {
     @Override
     public String getTrackPriceWithCurrency() {
         //TODO handle different currencies properly (UK pounds should go before!)
-        return itunesObject.getTrackPrice() + itunesObject.getCurrency();
+
+        return decimalFormat.format(itunesObject.getTrackPrice()) + itunesObject.getCurrency();
     }
 
     @Override
