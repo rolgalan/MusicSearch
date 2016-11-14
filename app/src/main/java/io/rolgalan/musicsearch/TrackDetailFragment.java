@@ -1,18 +1,21 @@
 package io.rolgalan.musicsearch;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.rolgalan.musicsearch.data.DataProvider;
 import io.rolgalan.musicsearch.model.Track;
+import io.rolgalan.musicsearch.view.TwoPaneableActivity;
 
 /**
  * A fragment representing a single Track detail screen.
@@ -35,8 +38,8 @@ public class TrackDetailFragment extends Fragment {
     TextView price;
     @BindView(R.id.list_title)
     TextView title;
-    // @BindView(R.id.list_image)
-    //  ImageView image;
+    @BindView(R.id.list_image)
+    ImageView image;
 
     /**
      * The fragment argument representing the item ID that this fragment
@@ -61,16 +64,7 @@ public class TrackDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the Track content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             mTrack = DataProvider.ITEM_MAP.get(getArguments().getInt(ARG_ITEM_ID));
-
-            Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(mTrack.getTrackName());
-            }
         }
     }
 
@@ -80,6 +74,13 @@ public class TrackDetailFragment extends Fragment {
 
         ButterKnife.bind(this, rootView);
         updateViews();
+
+        if (mTrack != null) {
+            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
+            if (appBarLayout != null) {
+                appBarLayout.setTitle(mTrack.getTrackName());
+            }
+        }
 
         return rootView;
     }
@@ -91,6 +92,25 @@ public class TrackDetailFragment extends Fragment {
         genre.setText(mTrack.getPrimaryGenreName());
         length.setText(mTrack.getTrackTime());
         price.setText(mTrack.getTrackPriceWithCurrency());
+
         title.setText(mTrack.getTrackName());
+
+        twoPaneAdjusts();
+    }
+
+    private void twoPaneAdjusts() {
+        boolean isTwoPane = ((TwoPaneableActivity) getActivity()).isTwoPane();
+
+        title.setVisibility(isTwoPane ? View.VISIBLE : View.GONE);
+        image.setVisibility(isTwoPane ? View.VISIBLE : View.GONE);
+
+        String imgUrl = mTrack.getArtworkUrl100();
+        if (isTwoPane && imgUrl != null && !imgUrl.isEmpty()) {
+            Glide.with(this).load(imgUrl)
+                    .fitCenter()
+                    .placeholder(R.drawable.placeholder_256)
+                    .crossFade()
+                    .into(image);
+        }
     }
 }
