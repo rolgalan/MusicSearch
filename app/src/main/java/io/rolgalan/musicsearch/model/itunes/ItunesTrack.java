@@ -18,7 +18,7 @@ import java.util.Date;
 
 public class ItunesTrack implements Track {
     private static final SimpleDateFormat serverParser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    private static final SimpleDateFormat viewParser = new SimpleDateFormat("dd/MM/yyyy");
+    private static final SimpleDateFormat viewParser = new SimpleDateFormat("MM/dd/yyyy");
 
     private final ItunesObject itunesObject;
     private Date mDate;
