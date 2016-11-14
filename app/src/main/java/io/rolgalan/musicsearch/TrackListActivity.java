@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -20,16 +21,18 @@ import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import io.rolgalan.musicsearch.data.DataProvider;
 import io.rolgalan.musicsearch.model.Track;
 import io.rolgalan.musicsearch.model.itunes.ItunesTracksList;
 import io.rolgalan.musicsearch.server.ApiManager;
 import io.rolgalan.musicsearch.server.SearchResponseInterface;
 import io.rolgalan.musicsearch.server.model.SearchResponse;
-
-import io.rolgalan.musicsearch.data.DataProvider;
+import io.rolgalan.musicsearch.util.TrackMediaPlayer;
 import io.rolgalan.musicsearch.view.ParentRecyclerView;
+import io.rolgalan.musicsearch.view.PlayPauseTransition;
 import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
 import io.rolgalan.musicsearch.view.TwoPaneableActivity;
+import io.rolgalan.musicsearch.view.PlayPauseTransition;
 
 /**
  * An activity for searching {@link Track} and representing a list of them.
@@ -51,6 +54,8 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     @BindView(R.id.search_bar_text)
     EditText searchBarText;
 
+    private PlayPauseTransition transition;
+
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -60,23 +65,36 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_track_list);
 
         ButterKnife.bind(this);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO Remove. Just for search tracks faster while developing
-                searchQuery("Michael Jackson");
-            }
-        });
+        checkTwoPane();
 
         setupRecyclerView();
 
         setupSearchView();
 
-        checkTwoPane();
+        setupFloatingButton();
+    }
+
+    private void setupFloatingButton() {
+        //TODO Remove. Just for search tracks faster while developing
+        searchQuery("Michael Jackson");
+
+        transition = new PlayPauseTransition(this);
+        fab.setImageDrawable(transition);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transition.animate();
+                TrackMediaPlayer.getInstance().togglePause();
+            }
+        });
+
+        fab.animate().translationYBy(256).setDuration(0).start();
     }
 
     /**
@@ -150,6 +168,7 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     private void searchQuery(String query) {
         searchView.showProgress();
         ApiManager.getInstance().tracksSearch(query, this);
+        //TODO save last queries for a search suggestion system
     }
 
     @Override
@@ -160,11 +179,9 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     @Override
     public void onResultsReceived(SearchResponse response) {
         Log.i(TAG, "results: " + response.getResultCount());
-        DataProvider.clear();
-        int i = 0;
-        for (Track t : new ItunesTracksList(response)) {
-            DataProvider.addTrack(i++, t);
-        }
+
+        DataProvider.setItunesTracksList(new ItunesTracksList(response));
+
         recyclerView.getAdapter().notifyDataSetChanged();
         searchView.hideProgress();
         if (searchView.isSearchBarFocused()) {
@@ -183,5 +200,19 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
                 new DividerItemDecoration(recyclerView.getContext(), LinearLayout.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DataProvider.ITEMS));
+    }
+
+    @Override
+    public void onTrackSelected() {
+        fab.animate()
+                .translationYBy(-256)
+                .setDuration(300)
+                .setInterpolator(new LinearInterpolator())
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        transition.animate();
+                    }
+                }).start();
     }
 }

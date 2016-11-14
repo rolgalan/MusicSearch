@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.rolgalan.musicsearch.model.Track;
+import io.rolgalan.musicsearch.model.itunes.ItunesTracksList;
 
 /**
  * Created by Roldán Galán on 11/11/2016.
@@ -23,5 +24,13 @@ public class DataProvider {
     public static void clear() {
         ITEMS.clear();
         ITEM_MAP.clear();
+    }
+
+    public static void setItunesTracksList(ItunesTracksList list) {
+        clear();
+        int i = 0;
+        for (Track t : list) {
+            DataProvider.addTrack(i++, t);
+        }
     }
 }

@@ -8,4 +8,6 @@ import android.support.v4.app.FragmentManager;
 public interface ParentRecyclerView extends TwoPaneableActivity {
 
     FragmentManager getSupportFragmentManager();
+
+    void onTrackSelected();
 }
