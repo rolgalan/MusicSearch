@@ -3,6 +3,10 @@ package io.rolgalan.musicsearch.server.model;
 import java.util.UUID;
 
 /**
+ * This class represents all the fields received in responses from iTunes API.
+ * For now, we're just interested in track song objects, but it could be
+ * extended in the future to support artist/video/album searching.
+ * <p>
  * Created by Roldán Galán on 10/11/2016.
  */
 
@@ -136,7 +140,7 @@ public class ItunesObject {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "ItunesObject " + wrapperType + " - " + kind;
     }
 }

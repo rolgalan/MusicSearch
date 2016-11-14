@@ -1,6 +1,9 @@
 package io.rolgalan.musicsearch.model;
 
 /**
+ * Core model data consumed by the app.
+ * Represents all the information displayable or required for a certaing track song.
+ * <p>
  * Created by Roldán Galán on 11/11/2016.
  */
 

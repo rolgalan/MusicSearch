@@ -4,6 +4,10 @@ import io.rolgalan.musicsearch.model.Track;
 import io.rolgalan.musicsearch.server.model.ItunesObject;
 
 /**
+ * Implementation of Track for iTunes objects.
+ * <p>
+ * Adds formatting for some fields.
+ * <p>
  * Created by Roldán Galán on 10/11/2016.
  */
 
