@@ -1,5 +1,7 @@
 package io.rolgalan.musicsearch.model;
 
+import java.util.Date;
+
 /**
  * Core model data consumed by the app.
  * Represents all the information displayable or required for a certaing track song.
@@ -18,7 +20,9 @@ public interface Track {
 
     String getArtworkUrl100();
 
-    String getReleaseDate();
+    Date getReleaseDate();
+
+    String getReleaseDateHuman();
 
     String getPreviewUrl();
 

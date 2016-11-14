@@ -3,6 +3,11 @@ package io.rolgalan.musicsearch.model.itunes;
 import io.rolgalan.musicsearch.model.Track;
 import io.rolgalan.musicsearch.server.model.ItunesObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 /**
  * Implementation of Track for iTunes objects.
  * <p>
@@ -12,7 +17,13 @@ import io.rolgalan.musicsearch.server.model.ItunesObject;
  */
 
 public class ItunesTrack implements Track {
+    private static final SimpleDateFormat serverParser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final SimpleDateFormat viewParser = new SimpleDateFormat("dd/MM/yyyy");
+
     private final ItunesObject itunesObject;
+    private Date mDate;
+    private String mLength;
+    private String mStringFormatted;
 
     public ItunesTrack(ItunesObject itunesObject) {
         this.itunesObject = itunesObject;
@@ -44,9 +55,17 @@ public class ItunesTrack implements Track {
     }
 
     @Override
-    public String getReleaseDate() {
-        //TODO human format
-        return itunesObject.getReleaseDate();
+    public Date getReleaseDate() {
+        if (mDate == null) {
+            if (itunesObject.getReleaseDate() != null && !itunesObject.getReleaseDate().isEmpty()) {
+                try {
+                    mDate = serverParser.parse(itunesObject.getReleaseDate());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return mDate;
     }
 
     @Override
@@ -56,7 +75,7 @@ public class ItunesTrack implements Track {
 
     @Override
     public String getTrackPriceWithCurrency() {
-        //TODO handle different currencies properly (UK pounds go before!)
+        //TODO handle different currencies properly (UK pounds should go before!)
         return itunesObject.getTrackPrice() + itunesObject.getCurrency();
     }
 
@@ -77,8 +96,28 @@ public class ItunesTrack implements Track {
 
     @Override
     public String getTrackTime() {
-        //TODO human format
-        return String.valueOf(getTrackTimeMillis());
+        if (mLength == null) {
+            int timeSecs = getTrackTimeMillis() / 1000;
+            mLength = parseSecondsToHumanReadable(timeSecs);
+        }
+        return mLength;
+    }
+
+    private String parseSecondsToHumanReadable(int time) {
+        if (time < 86400) {
+            if (time < 60) {
+                String aux = time < 10 ? "0" : "";
+                return aux.concat(String.valueOf(time));
+            }
+            int quotient = time / 60;
+            int remainder = time - quotient * 60;
+            return parseSecondsToHumanReadable(quotient) + ":" + parseSecondsToHumanReadable(remainder);
+
+        }
+        int quotient = time / 86400;
+        int remainder = time - quotient * 86400;
+        String aux = " " + (quotient > 1 ? "days" : "day") + " ";
+        return quotient + aux + parseSecondsToHumanReadable(remainder);
     }
 
     @Override
@@ -94,6 +133,16 @@ public class ItunesTrack implements Track {
     @Override
     public String getPrimaryGenreName() {
         return itunesObject.getPrimaryGenreName();
+    }
+
+    public String getReleaseDateHuman() {
+        if (mStringFormatted == null) {
+            if (getReleaseDate() == null) {
+                return "";
+            }
+            mStringFormatted = viewParser.format(getReleaseDate());
+        }
+        return mStringFormatted;
     }
 
     @Override

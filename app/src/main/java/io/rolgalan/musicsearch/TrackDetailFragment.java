@@ -88,7 +88,7 @@ public class TrackDetailFragment extends Fragment {
     public void updateViews() {
         album.setText(mTrack.getCollectionName());
         artist.setText(mTrack.getArtistName());
-        date.setText(mTrack.getReleaseDate());
+        date.setText(mTrack.getReleaseDateHuman());
         genre.setText(mTrack.getPrimaryGenreName());
         length.setText(mTrack.getTrackTime());
         price.setText(mTrack.getTrackPriceWithCurrency());
