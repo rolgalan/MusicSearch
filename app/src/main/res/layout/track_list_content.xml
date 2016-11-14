@@ -89,7 +89,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             <TextView
-                android:id="@+id/list_album"
+                android:id="@+id/list_genre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/list_item_margin"
@@ -107,7 +107,7 @@
             android:weightSum="1">
 
             <TextView
-                android:id="@+id/list_genre"
+                android:id="@+id/list_album"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
