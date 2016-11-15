@@ -80,9 +80,6 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     }
 
     private void setupFloatingButton() {
-        //TODO Remove. Just for search tracks faster while developing
-        searchQuery("Michael Jackson");
-
         transition = new PlayPauseTransition(this);
         fab.setImageDrawable(transition);
 
