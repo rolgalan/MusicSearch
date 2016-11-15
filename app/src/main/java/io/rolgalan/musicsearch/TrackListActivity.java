@@ -208,11 +208,11 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     @Override
     public void onTrackSelected(int position) {
         if (isTwoPane()) {
-            if (viewPager.isInitialized()){
-                //viewPager.setCurrentItem(position);
+            if (viewPager.isInitialized()) {
                 viewPager.setCurrentItem(position, true);
-            }else{
+            } else {
                 viewPager.init(position, getSupportFragmentManager(), this);
+                showFabButton();
             }
         } else {
             Intent intent = new Intent(this, TrackDetailActivity.class);
@@ -226,16 +226,13 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
                 .translationYBy(-256)
                 .setDuration(300)
                 .setInterpolator(new LinearInterpolator())
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        transition.animate();
-                    }
-                }).start();
+                .start();
     }
 
     @Override
     public void onPageSelected(int position) {
-        //
+        TrackMediaPlayer.initMediaPlayer(DataProvider.getTrack(position));
+        //TODO Add a listener to mediaplayer to start this animation
+        transition.playToPauseTransition();
     }
 }

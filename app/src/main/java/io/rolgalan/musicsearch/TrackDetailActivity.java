@@ -83,6 +83,13 @@ public class TrackDetailActivity extends AppCompatActivity implements TwoPaneabl
     @Override
     public void onPageSelected(int position) {
         loadTrackOnToolbar(position);
+        initMediaPlayer(position);
+    }
+
+    private void initMediaPlayer(int position) {
+        TrackMediaPlayer.initMediaPlayer(DataProvider.getTrack(position));
+        //TODO Add a listener to mediaplayer to start this animation
+        transition.playToPauseTransition();
     }
 
     private void setViewPager(int startingItem) {
@@ -100,18 +107,19 @@ public class TrackDetailActivity extends AppCompatActivity implements TwoPaneabl
                 TrackMediaPlayer.getInstance().togglePause();
             }
         });
-
-        transition.animate();
     }
 
     private void loadTrackOnToolbar(int pos) {
-        if (pos < 0) return;
-
-        Track track = DataProvider.ITEM_MAP.get(pos);
+        Track track = DataProvider.getTrack(pos);
 
         if (track == null) return;
 
         TrackView.loadImage(this, false, image, track);
         appBarLayout.setTitle(track.getTrackName());
+    }
+
+    public void onStop() {
+        super.onStop();
+        TrackMediaPlayer.releasePlayer();
     }
 }

@@ -33,4 +33,9 @@ public class DataProvider {
             DataProvider.addTrack(i++, t);
         }
     }
+
+    public static Track getTrack(int position) {
+        if (position<0) return null;
+        return DataProvider.ITEM_MAP.get(position);
+    }
 }

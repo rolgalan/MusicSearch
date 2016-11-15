@@ -53,32 +53,45 @@ public class TrackMediaPlayer extends MediaPlayer {
     }
 
     /**
-     * Starts playing a Track asynchronously
+     * If a current media player instance exists is released, and
+     * initialize a new one for this {@link Track}
      *
-     * @param track
+     * @param track The track to play
      */
-    public void startPlayingTrack(Track track) {
+    public static void initMediaPlayer(final Track track) {
+        if (track != null) {
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    TrackMediaPlayer.releasePlayer();
+                    TrackMediaPlayer.getInstance().startPlayingTrack(track);
+                }
+            };
+            new Handler().post(r);
+        }
+    }
+
+    /**
+     * Set the datasource for this {@link Track}, prepare the mediaPlayer
+     * asynchronously, and starts playing the track then
+     *
+     * @param track The track to be played
+     */
+    private void startPlayingTrack(Track track) {
         Log.i(TrackListActivity.TAG, "startPlayingTrack " + track.getTrackName());
         final String url = track.getPreviewUrl();
-
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    setDataSource(url);
-                    setOnPreparedListener(new OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mediaPlayer) {
-                            start();
-                        }
-                    });
-                    prepareAsync();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+        try {
+            setDataSource(url);
+            setOnPreparedListener(new OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    start();
                 }
-            }
-        };
-        new Handler().post(r);
+            });
+            prepareAsync();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
