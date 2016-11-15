@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 
+import io.rolgalan.musicsearch.util.CompatUtils;
+
 /**
  * Created by Roldán Galán on 14/11/2016.
  */
@@ -18,7 +20,7 @@ public class PlayPauseTransition extends TransitionDrawable {
     }
 
     private static Drawable[] getLayers(Context context) {
-        Drawable[] layers = {context.getDrawable(android.R.drawable.ic_media_play), context.getDrawable(android.R.drawable.ic_media_pause)};
+        Drawable[] layers = {CompatUtils.getDrawable(context, android.R.drawable.ic_media_play), CompatUtils.getDrawable(context, android.R.drawable.ic_media_pause)};
         return layers;
     }
 
