@@ -15,7 +15,7 @@ android {
     signingConfigs {
 
         release {
-            storeFile file('mykey.keystore.jks')
+            storeFile file('../mykey.keystore')
             storePassword 'android'
             keyAlias 'musicsearch'
             keyPassword 'android'
