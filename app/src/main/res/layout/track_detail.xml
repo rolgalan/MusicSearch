@@ -71,5 +71,14 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/detail_margin"/>
 
+        <Button
+            android:id="@+id/button_share"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="16dp"
+            android:text="@string/share_button"/>
+
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
