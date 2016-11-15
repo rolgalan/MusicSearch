@@ -1,7 +1,10 @@
 package io.rolgalan.musicsearch.view;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,6 +41,9 @@ public class TrackView {
     TextView title;
     @BindView(R.id.list_image)
     ImageView image;
+    @Nullable
+    @BindView(R.id.button_share)
+    Button shareButton;
 
     private Track mTrack;
 
@@ -62,7 +68,25 @@ public class TrackView {
         length.setText(mTrack.getTrackTime());
         price.setText(mTrack.getTrackPriceWithCurrency());
         title.setText(mTrack.getTrackName());
+        if (shareButton != null) initButton();
     }
+
+    private void initButton() {
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String sharingText = "I'm listening " + mTrack.getTrackName() + " from " + mTrack.getArtistName() + ". Do you wanna use this awesome app to explore the iTunes API?";
+
+                Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Enjoy listening music!");
+                shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, sharingText);
+
+                shareButton.getContext().startActivity(Intent.createChooser(shareIntent, "Share"));
+            }
+        });
+    }
+
 
     /**
      * A Track could be displayed in either small or big sizes, so
@@ -72,10 +96,10 @@ public class TrackView {
      * @param small   If this param is true, a small placeholder is used.
      */
     public void loadImage(Context context, boolean small) {
-       loadImage(context, small, image, mTrack);
+        loadImage(context, small, image, mTrack);
     }
 
-    public static void loadImage(Context context, boolean small, ImageView image, Track track){
+    public static void loadImage(Context context, boolean small, ImageView image, Track track) {
         String imgUrl = track.getArtworkUrl100();
         if (imgUrl != null && !imgUrl.isEmpty()) {
             Glide.with(context).load(imgUrl)
