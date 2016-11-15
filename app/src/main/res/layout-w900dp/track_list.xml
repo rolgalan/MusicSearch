@@ -3,8 +3,8 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:layout_marginLeft="16dp"
-              android:layout_marginRight="16dp"
+              android:layout_marginLeft="4dp"
+              android:layout_marginRight="4dp"
               android:baselineAligned="false"
               android:divider="?android:attr/dividerHorizontal"
               android:orientation="horizontal"
@@ -24,8 +24,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="@dimen/item_width"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context="io.rolgalan.musicsearch.TrackListActivity"
         tools:listitem="@layout/track_list_content"/>
@@ -34,6 +32,7 @@
         android:id="@+id/track_detail_viewpager"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginLeft="4dp"
         android:layout_weight="3"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
