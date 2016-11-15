@@ -9,16 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
-import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,28 +27,28 @@ import io.rolgalan.musicsearch.server.ApiManager;
 import io.rolgalan.musicsearch.server.SearchResponseInterface;
 import io.rolgalan.musicsearch.server.model.SearchResponse;
 import io.rolgalan.musicsearch.util.TrackMediaPlayer;
+import io.rolgalan.musicsearch.view.MyFloatingSearchView;
 import io.rolgalan.musicsearch.view.ParentRecyclerView;
 import io.rolgalan.musicsearch.view.PlayPauseTransition;
 import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
 import io.rolgalan.musicsearch.view.TrackDetailViewPager;
 import io.rolgalan.musicsearch.view.TwoPaneableActivity;
-import io.rolgalan.musicsearch.view.PlayPauseTransition;
 
 /**
  * An activity for searching {@link Track} and representing a list of them.
- * This activity has different presentations for handset and tablet-size devices.
+app/src/main/java/io/rolgalan/musicsearch/TrackListActivity.java * This activity has different presentations for handset and tablet-size devices.
  * On handsets, the activity presents a list of items, which when touched,
  * lead to a {@link TrackDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface, TwoPaneableActivity, TrackDetailViewPager.OnPageSelectedListener {
+public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface, TwoPaneableActivity, TrackDetailViewPager.OnPageSelectedListener, MyFloatingSearchView.SearchQueryListener {
     public static final String TAG = "Music";
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
     @BindView(R.id.floating_search_view)
-    FloatingSearchView searchView;
+    MyFloatingSearchView searchView;
     @BindView(R.id.track_list)
     RecyclerView recyclerView;
     @BindView(R.id.search_bar_text)
@@ -110,65 +107,32 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     }
 
     private void setupSearchView() {
-        //Fix bug in library for som Android versions https://github.com/arimorty/floatingsearchview/issues/159
-        searchBarText.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        searchBarText.setSingleLine();
+        searchView.init(searchBarText, this);
 
-        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+        searchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
             @Override
-            public void onSearchTextChanged(String oldQuery, final String newQuery) {
-                Log.d(TAG, "onSearchTextChanged() " + newQuery);
-
-                if (!oldQuery.equals("") && newQuery.equals("")) {
-                    searchView.clearSuggestions();
-                } else {
-                    //TODO load suggestions based on newQuery
-                    //searchView.showProgress();
-                    //and pass them with searchView.swapSuggestions(newSuggestions);
+            public void onActionMenuItemSelected(MenuItem item) {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.sort_length:
+                        DataProvider.sortByLength();
+                        break;
+                    case R.id.sort_genre:
+                        DataProvider.sortByGenre();
+                        break;
+                    case R.id.sort_price:
+                        DataProvider.sortByPrice();
+                        break;
+                    case R.id.sort_original:
+                        DataProvider.sortByOriginalReceived();
+                        break;
                 }
-            }
-        });
-
-        searchBarText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String mLastQuery = textView.getText().toString();
-                Log.d(TAG, "onEditorAction() " + mLastQuery);
-                searchQuery(mLastQuery);
-                return true;
-            }
-        });
-
-        searchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
-            @Override
-            public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
-                String mLastQuery = searchSuggestion.getBody();
-                Log.d(TAG, "onSuggestionClicked() " + mLastQuery);
-                searchQuery(mLastQuery);
-            }
-
-            @Override
-            public void onSearchAction(String query) {
-                Log.d(TAG, "onSearchAction() " + query);
-                //mLastQuery = query;
-                searchQuery(query);
-            }
-        });
-
-        searchView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                Log.d(TAG, "onKeyListener() " + keyCode);
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    Log.d(TAG, "onKeyListener() KEYCODE_ENTER");
-                    //return true;
-                }
-                return false;
+                recyclerView.getAdapter().notifyDataSetChanged();
             }
         });
     }
 
-    private void searchQuery(String query) {
+    public void searchQuery(String query) {
         searchView.showProgress();
         ApiManager.getInstance().tracksSearch(query, this);
         //TODO save last queries for a search suggestion system
