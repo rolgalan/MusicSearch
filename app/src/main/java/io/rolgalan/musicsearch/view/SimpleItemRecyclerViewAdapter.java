@@ -2,7 +2,6 @@ package io.rolgalan.musicsearch.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,22 +43,7 @@ public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleIt
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (parent.isTwoPane()) {
-                    Bundle arguments = new Bundle();
-                    arguments.putInt(TrackDetailFragment.ARG_ITEM_ID, position);
-                    TrackDetailFragment fragment = new TrackDetailFragment();
-                    fragment.setArguments(arguments);
-                    parent.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.track_detail_container, fragment)
-                            .commit();
-                    parent.onTrackSelected();
-                } else {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, TrackDetailActivity.class);
-                    intent.putExtra(TrackDetailFragment.ARG_ITEM_ID, position);
-
-                    context.startActivity(intent);
-                }
+                parent.onTrackSelected(position);
             }
         });
     }
@@ -85,7 +69,7 @@ public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleIt
         }
 
         public void setTrack(Track track) {
-            trackView .setTrack(track);
+            trackView.setTrack(track);
         }
     }
 }

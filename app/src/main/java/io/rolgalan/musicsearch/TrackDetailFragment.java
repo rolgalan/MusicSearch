@@ -1,9 +1,7 @@
 package io.rolgalan.musicsearch;
 
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,13 +56,6 @@ public class TrackDetailFragment extends Fragment {
 
         updateViews();
 
-        if (mTrack != null) {
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(mTrack.getTrackName());
-            }
-        }
-
         return rootView;
     }
 
@@ -82,7 +73,7 @@ public class TrackDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        initMediaPlayer();
+        //initMediaPlayer();
     }
 
     @Override

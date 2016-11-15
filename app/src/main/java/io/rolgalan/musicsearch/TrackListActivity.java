@@ -1,6 +1,8 @@
 package io.rolgalan.musicsearch;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +33,7 @@ import io.rolgalan.musicsearch.util.TrackMediaPlayer;
 import io.rolgalan.musicsearch.view.ParentRecyclerView;
 import io.rolgalan.musicsearch.view.PlayPauseTransition;
 import io.rolgalan.musicsearch.view.SimpleItemRecyclerViewAdapter;
+import io.rolgalan.musicsearch.view.TrackDetailViewPager;
 import io.rolgalan.musicsearch.view.TwoPaneableActivity;
 import io.rolgalan.musicsearch.view.PlayPauseTransition;
 
@@ -42,7 +45,7 @@ import io.rolgalan.musicsearch.view.PlayPauseTransition;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface, TwoPaneableActivity {
+public class TrackListActivity extends AppCompatActivity implements ParentRecyclerView, SearchResponseInterface, TwoPaneableActivity, TrackDetailViewPager.OnPageSelectedListener {
     public static final String TAG = "Music";
 
     @BindView(R.id.fab)
@@ -53,6 +56,9 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     RecyclerView recyclerView;
     @BindView(R.id.search_bar_text)
     EditText searchBarText;
+    @Nullable
+    @BindView(R.id.track_detail_viewpager)
+    TrackDetailViewPager viewPager;
 
     private PlayPauseTransition transition;
 
@@ -100,7 +106,7 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
      * If this view is present, then the activity should be in two-pane mode.
      */
     private void checkTwoPane() {
-        mTwoPane = findViewById(R.id.track_detail_container) != null;
+        mTwoPane = viewPager != null;
     }
 
     private void setupSearchView() {
@@ -200,7 +206,22 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
     }
 
     @Override
-    public void onTrackSelected() {
+    public void onTrackSelected(int position) {
+        if (isTwoPane()) {
+            if (viewPager.isInitialized()){
+                //viewPager.setCurrentItem(position);
+                viewPager.setCurrentItem(position, true);
+            }else{
+                viewPager.init(position, getSupportFragmentManager(), this);
+            }
+        } else {
+            Intent intent = new Intent(this, TrackDetailActivity.class);
+            intent.putExtra(TrackDetailFragment.ARG_ITEM_ID, position);
+            startActivity(intent);
+        }
+    }
+
+    private void showFabButton() {
         fab.animate()
                 .translationYBy(-256)
                 .setDuration(300)
@@ -211,5 +232,10 @@ public class TrackListActivity extends AppCompatActivity implements ParentRecycl
                         transition.animate();
                     }
                 }).start();
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        //
     }
 }

@@ -9,5 +9,5 @@ public interface ParentRecyclerView extends TwoPaneableActivity {
 
     FragmentManager getSupportFragmentManager();
 
-    void onTrackSelected();
+    void onTrackSelected(int position);
 }
